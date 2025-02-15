@@ -5,5 +5,5 @@ app_name = "api_v1_holidays"
 
 urlpatterns = [
    re_path(r"^$", views.get_holidays, name="list"),
-#    re_path(r"^(?P<pk>\d+)/$", views.holidayDetail, name="detail"),
+   re_path(r"^get-detail/$", views.holidayDetail, name="detail"),
 ]
