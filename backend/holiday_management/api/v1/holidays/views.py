@@ -26,7 +26,9 @@ def get_holidays(request):
     cache_key = f'holidays_{country}_{year}'
     cached_data = cache.get(cache_key)
     if cached_data:
-        return Response(cached_data)
+        if search_name:
+            cached_data = [holiday for holiday in cached_data if search_name.lower() in holiday['name'].lower()]
+        return Response(cached_data, status=status.HTTP_200_OK)
     url = f"https://calendarific.com/api/v2/holidays?api_key={API_KEY}&country={country}&year={year}&uuid=true"
     response = requests.get(url)
     data = response.json()['response']['holidays']
