@@ -19,15 +19,6 @@ def get_holidays(request):
     Parameters:
     year (int): The year to get the holidays for. Defaults to the current year.
     country (str): The country to get the holidays for. Defaults to 'US'.
-
-    Returns:
-    A list of holidays, each represented as a dictionary with the following keys:
-    name (str): The name of the holiday.
-    date (str): The date of the holiday in the format 'YYYY-MM-DD'.
-    description (str): A description of the holiday.
-    location (str): The location of the holiday.
-    type (str): The type of holiday (e.g. national, regional, local).
-    language (str): The language of the holiday name and description.
     """
     year = request.GET.get('year', datetime.datetime.now().year)
     country = request.GET.get('country', 'US')
@@ -46,6 +37,27 @@ def get_holidays(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def holidayDetail(request):
-    pass
+    """
+    API endpoint to get the details of a given holiday.
+
+    Parameters:
+    urlid (str): The urlid of the holiday to get the details for.
+    year (int): The year to get the holiday details for. Defaults to the current year.
+    country (str): The country to get the holiday details for. Defaults to 'US'.
+    """
+    
+    urlid = request.GET.get('urlid')
+    year = request.GET.get('year', datetime.datetime.now().year)
+    country = request.GET.get('country', 'US')
+    url = f"https://calendarific.com/api/v2/holidays?api_key={API_KEY}&country={country}&year={year}"
+    cache_key = f'holidays_{country}_{year}_{urlid}'
+    cached_data = cache.get(cache_key)
+    if cached_data:
+        return Response(cached_data)
+    response = requests.get(url)
+    data = response.json()['response']['holidays']
+    holiday=[holiday for holiday in data if holiday['urlid'] == urlid][0]
+    cache.set(cache_key, holiday, timeout=86400)
+    return Response(holiday, status=status.HTTP_200_OK)
