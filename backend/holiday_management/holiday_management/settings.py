@@ -3,6 +3,12 @@
 from pathlib import Path
 from datetime import timedelta
 import os
+import environ
+
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+env = environ.Env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -135,4 +141,4 @@ STATICFILES_DIRS = (
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CALENDRIFIC_API_KEY = 'cGT4MucbiqrjmXkBR5tOIZq51FD272HE'
+CALENDRIFIC_API_KEY=env("CALENDRIFIC_API_KEY")
